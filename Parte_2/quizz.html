@@ -11,13 +11,15 @@
     <h1>PHP Quiz</h1>
 
     <?php
+        include 'process.php';
+        $questions = $quiz->getQuestions();
         foreach ($questions as $index => $question) {
             echo '<div class="question">';
             echo "<p>" . ($index + 1) . ". " . $question['question'] . "</p>";
-    foreach ($question['options'] as $option => $value) {
-            echo '<label><input type="radio" name="q' . ($index + 1) . '" value="' . $option . '"> ' . $option . ') ' . $value . '</label><br>';
-        }
-        echo '</div>';
+            foreach ($question['options'] as $option => $value) {
+                echo '<label><input type="radio" name="q' . ($index + 1) . '" value="' . $option . '"> ' . $option . ') ' . $value . '</label><br>';
+            }
+            echo '</div>';
         }
     ?>
 

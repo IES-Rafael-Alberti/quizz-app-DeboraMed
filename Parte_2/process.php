@@ -14,7 +14,8 @@ if ($conn->connect_error) {
 }
 
 // consulta preparada para recuperar preguntas
-$stmt = $conn->prepare("SELECT question, correct_answer FROM QuizQuestions");
+$stmt = $conn->prepare("SELECT question_id, question_text, correct_option FROM Questions WHERE quiz_id = ?");
+$stmt->bind_param("i", $quiz_id); // asume que $quiz_id es el ID del cuestionario que quieres cargar
 $stmt->execute();
 
 //resultados
@@ -23,7 +24,6 @@ $result = $stmt->get_result();
 // verificar si cada pregunta ha sido respondida
 foreach ($_POST as $question => $answer) {
     if (!isset($answer) || (is_array($answer) && empty($answer))) {
-        // agrega un error al array
         $errors[$question] = 'Debes responder a esta pregunta.';
     }
 }
@@ -37,18 +37,10 @@ if (!empty($errors)) {
 class Quiz {
     private $errors = [];
     private $questions = [];
-    private $answers = [
-        'q1' => 'b',
-        'q2' => 'c',
-        'q3' => 'b',
-        'q4' => 'a',
-        'q5' => 'd'
-    ];
+    private $answers = [];
     private $userAnswers = [];
     // Método para validar las respuestas del usuario
     public function validateAnswers($question, $answer) {
-
-
         foreach ($this->userAnswers as $question => $answer) {
             if (!isset($answer) || (is_array($answer) && empty($answer))) {
                 // Agrega un error al array
@@ -103,30 +95,28 @@ $quiz = new Quiz();
 // Agregar las preguntas y respuestas correctas al cuestionario
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $quiz->addQuestion($row["question"], $row["correct_answer"]);
+        $quiz->addQuestion($row["question_id"], $row["correct_option"]);
     }
 } else {
     echo "0 results";
 }
 $conn->close();
 
-// Recoger las respuestas del usuario
-$userAnswers = [
-    'q1' => isset($_POST['q1']) ? $_POST['q1'] : [],
-    'q2' => isset($_POST['q2']) ? $_POST['q2'] : [],
-    'q3' => isset($_POST['q3']) ? $_POST['q3'] : [],
-    'q4' => isset($_POST['q4']) ? $_POST['q4'] : [],
-    'q5' => isset($_POST['q5']) ? $_POST['q5'] : [],
-];
-// Enviar las respuestas del usuario al cuestionario
+// Recoge las respuestas
+$userAnswers = [];
+foreach ($quiz->getQuestions() as $question_id) {
+    $userAnswers[$question_id] = isset($_POST[$question_id]) ? $_POST[$question_id] : [];
+}
+// Envialas respuestas al cuestionario
 $quiz->submitAnswers($userAnswers);
-// Calcular la puntuación
+// Calcula la puntuación
 $score = $quiz->calculateScore();
-// Generar comentarios
+// Genera comentarios
 $feedback = $quiz->generateFeedback();
+
 // Mostrar la puntuación y los comentarios
-echo "Puntuación: $score/5";
+echo "Puntuación: " . $score . "<br>";
 foreach ($feedback as $comment) {
-    echo "<p>$comment</p>";
+    echo "<p>" . $comment . "</p>";
 }
 ?>
