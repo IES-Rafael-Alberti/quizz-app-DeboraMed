@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Quiz</title>
+    <link rel="stylesheet" href="quiz.css">
+</head>
+<body>
+<form method="post" action="process.php">
+    <h1>PHP Quiz</h1>
+
+    <?php
+        foreach ($questions as $index => $question) {
+            echo '<div class="question">';
+            echo "<p>" . ($index + 1) . ". " . $question['question'] . "</p>";
+    foreach ($question['options'] as $option => $value) {
+            echo '<label><input type="radio" name="q' . ($index + 1) . '" value="' . $option . '"> ' . $option . ') ' . $value . '</label><br>';
+        }
+        echo '</div>';
+        }
+    ?>
+
+    <br>
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>

@@ -1,6 +1,25 @@
 <?php
 $errors = [];
 
+// conexion DB
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "quizzDB";
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// verificacion conexión
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// consulta preparada para recuperar preguntas
+$stmt = $conn->prepare("SELECT question, correct_answer FROM QuizQuestions");
+$stmt->execute();
+
+//resultados
+$result = $stmt->get_result();
+
 // verificar si cada pregunta ha sido respondida
 foreach ($_POST as $question => $answer) {
     if (!isset($answer) || (is_array($answer) && empty($answer))) {
@@ -26,9 +45,9 @@ class Quiz {
         'q5' => 'd'
     ];
     private $userAnswers = [];
-     // Método para validar las respuestas del usuario
+    // Método para validar las respuestas del usuario
     public function validateAnswers($question, $answer) {
-        
+
 
         foreach ($this->userAnswers as $question => $answer) {
             if (!isset($answer) || (is_array($answer) && empty($answer))) {
@@ -39,11 +58,11 @@ class Quiz {
                 foreach ($errors as $error) {
                     echo "<p>$error</p>";
                 }
-            } 
+            }
         }
         return $errors;
     }
-    // agregar una pregunta y su respuesta
+// agregar una pregunta y su respuesta
     public function addQuestion($question, $answer) {
         array_push($this->questions, $question);
         array_push($this->answers, $answer);
@@ -82,12 +101,16 @@ class Quiz {
 // Crear una nueva instancia de la clase Quiz
 $quiz = new Quiz();
 // Agregar las preguntas y respuestas correctas al cuestionario
-$quiz->addQuestion('¿Qué significa PHP?', 'b');
-$quiz->addQuestion('¿Cuál de los siguientes NO es un tipo de dato de PHP?', 'c');
-$quiz->addQuestion('¿Cuál es el resultado de echo "Hola" . " " . "Mundo";?', 'b');
-$quiz->addQuestion('En PHP, ¿qué bucle se utiliza para ejecutar un bloque de código un número especificado de veces?', 'a');
-$quiz->addQuestion('¿Qué función de PHP se utiliza para abrir un archivo para escritura?', 'd');
-// Recoger las respuestas del usuario desde $_POST
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $quiz->addQuestion($row["question"], $row["correct_answer"]);
+    }
+} else {
+    echo "0 results";
+}
+$conn->close();
+
+// Recoger las respuestas del usuario
 $userAnswers = [
     'q1' => isset($_POST['q1']) ? $_POST['q1'] : [],
     'q2' => isset($_POST['q2']) ? $_POST['q2'] : [],
