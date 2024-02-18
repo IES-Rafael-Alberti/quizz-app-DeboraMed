@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Quiz</title>
+    <link rel="stylesheet" href="quizz.css">
+</head>
+<body>
+    <form method="post" action="updateQuestion.php">
+        <label for="question_id">ID de la pregunta:</label><br>
+        <input type="text" id="question_id" name="question_id"><br>
+        <label for="question_text">Nuevo texto de la pregunta:</label><br>
+        <input type="text" id="question_text" name="question_text"><br>
+        <label for="correct_option">Nueva opción correcta:</label><br>
+        <input type="text" id="correct_option" name="correct_option"><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

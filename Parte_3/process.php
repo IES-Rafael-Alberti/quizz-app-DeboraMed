@@ -54,7 +54,7 @@ class Quiz {
         }
         return $errors;
     }
-    // agregar una pregunta y su respuesta
+// agregar una pregunta y su respuesta
     public function addQuestion($question, $answer) {
         array_push($this->questions, $question);
         array_push($this->answers, $answer);
